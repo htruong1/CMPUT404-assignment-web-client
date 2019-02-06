@@ -33,7 +33,25 @@ class HTTPResponse(object):
         self.body = body
 
 class HTTPClient(object):
-    #def get_host_port(self,url):
+
+    def get_host_port(self, url):
+        parsedURL = urllib.parse.urlparse(url)
+        print(str(parsedURL), parsedURL.port)
+        host = parsedURL.hostname
+        port = 80
+        path = parsedURL.path
+
+        if (":" in host):
+            tempHost = host.split(":")
+            host = tempHost[0]
+        
+        if (parsedURL.port) != None:
+            port = int(parsedURL.port)
+
+        if (path == ""):
+            path = "/"
+
+        return (host, port, path)
 
     def connect(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,13 +59,25 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
-        return None
+        parsedData = data.split(" ")
+        code = int(parsedData[1])
+        return code
 
-    def get_headers(self,data):
+    def get_headers(self, data):
+
         return None
 
     def get_body(self, data):
-        return None
+        parsedData = data.split(" ")
+        parsedData2 = data.split("\r\n")
+        shouldAppend = False
+        body = ""
+        for responseLines in parsedData2:
+            if ("<html" in responseLines):
+                shouldAppend = True 
+            if (shouldAppend):
+                body = body + responseLines + "\r\n"
+        return body
     
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
@@ -65,11 +95,54 @@ class HTTPClient(object):
                 buffer.extend(part)
             else:
                 done = not part
+     
+     
         return buffer.decode('utf-8')
 
+    def get_port(self, url):
+        parsed_url = urllib.parse.urlparse(url)
+        if(parsed_url.port):
+            return parsed_url.port
+        else:
+            return 80
+
+    def get_url_content(self, url):        
+        parsed_url = urllib.parse.urlparse(url)
+
+        host = parsed_url.hostname
+
+        path = parsed_url.path
+        if(parsed_url.path == ""):
+            path = "/"
+
+        #query = ""
+        if(parsed_url.query):
+            #query = "?"+parsed_url.query
+            path += "?"+parsed_url.query
+        print(path, "path to life")
+        return path, host
+
     def GET(self, url, args=None):
-        code = 500
-        body = ""
+        host, port, path = self.get_host_port(url)
+
+        self.connect(host, port)
+
+        payload = "GET {} HTTP/1.1\r\nHost: {}\r\n\r\n".format(path, host)
+        # print(payload)
+
+        self.sendall(payload)
+        connectionData = self.recvall(self.socket)
+        self.close()
+        splitData= connectionData.split("\r\n")
+        code = self.get_code(connectionData)
+        body = self.get_body(connectionData)
+
+        self.connect(host, self.get_port(url))
+
+        payload = "GET {} HTTP/1.1\r\nHost: {}\r\n\r\n".format(path, host)
+        print(payload)
+        self.sendall(payload)
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
