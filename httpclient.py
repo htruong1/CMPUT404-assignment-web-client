@@ -61,13 +61,12 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
-        code = ""
-        if len(data) <= 1:
-            return 400
-        else:
+        try:
             parsedData = data.split(" ")
             code = int(parsedData[1])
-        return code
+            return code
+        except:
+            return "error"
 
     def get_headers(self, data):
         parsedData = data.split("\r\n\r\n")
