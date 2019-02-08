@@ -119,6 +119,7 @@ class HTTPClient(object):
         body = self.get_body(connectionData)
         headers = self.get_headers(connectionData)
 
+        print(body)
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
