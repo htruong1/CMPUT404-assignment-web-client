@@ -9,7 +9,8 @@ Make a simple web-client like curl or wget
 
 Contributors / Licensing
 ========================
-
+Assignment done by Henry Truong (htruong1)
+Collaboraters: shchau, dwai, ima
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle, 
 https://github.com/tywtyw2002, and https://github.com/treedust
 
