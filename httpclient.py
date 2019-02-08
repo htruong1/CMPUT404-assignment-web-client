@@ -148,6 +148,7 @@ class HTTPClient(object):
         header = self.get_headers(connectionData)
         code = self.get_code(connectionData)
         body = self.get_body(connectionData)
+        print(body)
 
         return HTTPResponse(code, body)
 
