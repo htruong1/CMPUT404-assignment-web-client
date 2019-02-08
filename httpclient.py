@@ -131,11 +131,8 @@ class HTTPClient(object):
         postParams = ""
 
         if args != None:
-            for key in args:
-                postParams = postParams + str(key) + "=" + str(args[key]) +"&"
-
+            postParams = urllib.parse.urlencode(args)
             contentLength = len(postParams)
-
 
         payload = """POST {} HTTP/1.1\r\nHost: {}
             \r\nContent-Type: application/x-www-form-urlencoded
